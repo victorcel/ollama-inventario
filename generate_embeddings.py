@@ -2,18 +2,23 @@
 import psycopg2
 import ollama
 import time
-from psycopg2.extras import execute_values
+import os
+from dotenv import load_dotenv
+
+# Cargar variables de entorno
+load_dotenv()
 
 # Configuración
 DB_CONFIG = {
-    'host': 'localhost',
-    'port': 5432,
-    'database': 'inventario',
-    'user': 'inventory_user',
-    'password': 'changeme_secure_password'
+    'host': os.getenv('DB_HOST', 'localhost'),
+    'port': int(os.getenv('DB_PORT', 5432)),
+    'database': os.getenv('DB_NAME', 'inventario'),
+    'user': os.getenv('DB_USER', 'inventory_user'),
+    'password': os.getenv('DB_PASSWORD', 'changeme_secure_password')
 }
 
-OLLAMA_MODEL = 'all-minilm'
+OLLAMA_MODEL = os.getenv('OLLAMA_MODEL', 'all-minilm')
+OLLAMA_HOST = os.getenv('OLLAMA_HOST', 'http://localhost:11434')
 
 
 def conectar_db():
@@ -24,7 +29,9 @@ def conectar_db():
 def generar_embedding(texto):
     """Generar embedding usando Ollama"""
     try:
-        response = ollama.embed(
+        # Configurar cliente de Ollama si se especifica un host personalizado
+        client = ollama.Client(host=OLLAMA_HOST)
+        response = client.embed(
             model=OLLAMA_MODEL,
             input=texto
         )
