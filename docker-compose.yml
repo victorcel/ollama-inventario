@@ -55,7 +55,7 @@ services:
           memory: 3G
           cpus: '2'
         reservations:
-          memory: 1.5G
+          memory: 3G
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "ollama", "list"]
