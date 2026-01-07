@@ -1,0 +1,30 @@
+###
+GET http://localhost:5100/api/productos/sugerencias
+
+
+###
+POST http://localhost:5100/api/productos/buscar
+Content-Type: application/json
+
+{
+  "consulta": "silla y zonas urbanas",
+  "limite": 2
+}
+
+
+###
+POST http://localhost:5100/api/productos
+Content-Type: application/json
+
+{
+  "codigo": "PROD-ANT-5G-001",
+  "nombre": "Antena 5G Omnidireccional de Alto Rendimiento",
+  "descripcion": "Antena omnidireccional de alta ganancia para redes 5G NR, diseñada para aplicaciones industriales y comerciales. Soporta bandas n77, n78 y n79. Construcción robusta con protección IP67 contra agua y polvo. Ideal para instalaciones exteriores en zonas urbanas y rurales. Rango de frecuencia 3.3-3.8 GHz con ganancia de 8 dBi. Incluye soporte de montaje universal y cable coaxial de 5 metros. Compatible con módems Huawei, ZTE, Nokia y Ericsson.",
+  "categoria": "Antenas y Comunicaciones Inalámbricas",
+  "subcategoria": "Antenas 5G Exteriores",
+  "precio": 245.99,
+  "moneda": "USD",
+  "stock": 15,
+  "ubicacion": "Almacén A - Pasillo 3 - Estante B2",
+  "proveedor": "TechWave Communications Inc."
+}
