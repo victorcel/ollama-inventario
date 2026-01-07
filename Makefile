@@ -124,14 +124,87 @@ wait-db: ## Esperar a que PostgreSQL esté listo
 # OLLAMA - MODELOS
 # ════════════════════════════════════════════════════════
 
-pull-model: ## Descargar modelo de embeddings
-	@echo "$(YELLOW)Descargando modelo all-minilm...$(NC)"
-	@docker exec $(OLLAMA_CONTAINER) ollama pull all-minilm
-	@echo "$(GREEN)✓ Modelo descargado$(NC)"
+pull-model: ## Descargar modelo de embeddings (uso: make pull-model MODEL=nombre)
+	@MODEL_NAME=$${MODEL:-all-minilm}; \
+	echo "$(YELLOW)Descargando modelo $$MODEL_NAME...$(NC)"; \
+	docker exec $(OLLAMA_CONTAINER) ollama pull $$MODEL_NAME && \
+	echo "$(GREEN)✓ Modelo $$MODEL_NAME descargado$(NC)" || \
+	echo "$(RED)✗ Error descargando modelo $$MODEL_NAME$(NC)"
 
 list-models: ## Listar modelos instalados
 	@echo "Modelos instalados en Ollama:"
 	@docker exec $(OLLAMA_CONTAINER) ollama list
+
+check-model: ## Verificar si un modelo está instalado (uso: make check-model MODEL=nombre)
+	@if [ -z "$(MODEL)" ]; then \
+		echo "$(RED)Error: Especifica el modelo con MODEL=nombre$(NC)"; \
+		echo "Ejemplo: make check-model MODEL=all-minilm"; \
+		exit 1; \
+	fi
+	@echo "$(YELLOW)Verificando modelo $(MODEL)...$(NC)"
+	@if docker exec $(OLLAMA_CONTAINER) ollama list | grep -q "$(MODEL)"; then \
+		echo "$(GREEN)✓ Modelo $(MODEL) está instalado$(NC)"; \
+	else \
+		echo "$(RED)✗ Modelo $(MODEL) NO está instalado$(NC)"; \
+		exit 1; \
+	fi
+
+ensure-model: ## Asegurar que un modelo existe, descargarlo si no (uso: make ensure-model MODEL=nombre)
+	@if [ -z "$(MODEL)" ]; then \
+		echo "$(RED)Error: Especifica el modelo con MODEL=nombre$(NC)"; \
+		echo "Ejemplo: make ensure-model MODEL=all-minilm"; \
+		exit 1; \
+	fi
+	@echo "$(YELLOW)Verificando modelo $(MODEL)...$(NC)"
+	@if docker exec $(OLLAMA_CONTAINER) ollama list | grep -q "$(MODEL)"; then \
+		echo "$(GREEN)✓ Modelo $(MODEL) ya está instalado$(NC)"; \
+	else \
+		echo "$(YELLOW)Modelo $(MODEL) no encontrado, descargando...$(NC)"; \
+		docker exec $(OLLAMA_CONTAINER) ollama pull $(MODEL) && \
+		echo "$(GREEN)✓ Modelo $(MODEL) descargado e instalado$(NC)" || \
+		(echo "$(RED)✗ Error descargando modelo $(MODEL)$(NC)" && exit 1); \
+	fi
+
+change-model: ensure-model ## Cambiar modelo de embeddings (uso: make change-model MODEL=nombre)
+	@if [ -z "$(MODEL)" ]; then \
+		echo "$(RED)Error: Especifica el modelo con MODEL=nombre$(NC)"; \
+		echo ""; \
+		echo "Modelos populares para embeddings:"; \
+		echo "  • all-minilm (pequeño, rápido)"; \
+		echo "  • nomic-embed-text (multilingüe, calidad alta)"; \
+		echo "  • mxbai-embed-large (muy preciso)"; \
+		echo ""; \
+		echo "Ejemplo: make change-model MODEL=nomic-embed-text"; \
+		exit 1; \
+	fi
+	@echo "$(YELLOW)Cambiando modelo a $(MODEL)...$(NC)"
+	@if [ -f .env ]; then \
+		if grep -q "^OLLAMA_MODEL=" .env; then \
+			sed -i.bak "s/^OLLAMA_MODEL=.*/OLLAMA_MODEL=$(MODEL)/" .env && rm -f .env.bak; \
+		else \
+			echo "OLLAMA_MODEL=$(MODEL)" >> .env; \
+		fi; \
+		echo "$(GREEN)✓ Modelo cambiado a $(MODEL) en .env$(NC)"; \
+		echo ""; \
+		echo "$(YELLOW)⚠️  IMPORTANTE:$(NC)"; \
+		echo "  1. Reinicia los servicios: $(GREEN)make restart$(NC)"; \
+		echo "  2. Regenera embeddings: $(GREEN)make embeddings$(NC)"; \
+	else \
+		echo "$(RED)✗ Error: Archivo .env no encontrado$(NC)"; \
+		echo "Ejecuta: make config"; \
+		exit 1; \
+	fi
+
+show-model: ## Mostrar modelo actual configurado
+	@echo "Modelo configurado en .env:"
+	@if [ -f .env ]; then \
+		grep "^OLLAMA_MODEL=" .env || echo "$(YELLOW)⚠️  OLLAMA_MODEL no configurado$(NC)"; \
+	else \
+		echo "$(RED)✗ Archivo .env no encontrado$(NC)"; \
+	fi
+	@echo ""
+	@echo "Modelos disponibles en Ollama:"
+	@docker exec $(OLLAMA_CONTAINER) ollama list 2>/dev/null || echo "$(RED)✗ Ollama no está corriendo$(NC)"
 
 # ════════════════════════════════════════════════════════
 # BASE DE DATOS
