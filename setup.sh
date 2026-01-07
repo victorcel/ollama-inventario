@@ -8,7 +8,7 @@ mkdir -p data/postgres
 mkdir -p data/ollama
 
 # 2. Verificar que docker-compose.yml e init-db.sql existen
-if [ ! -f "docker compose.yml" ]; then
+if [ ! -f "docker-compose.yml" ]; then
     echo "Error: docker compose.yml no encontrado"
     exit 1
 fi
