@@ -1,1 +1,50 @@
-.idea
+# Gitignore para proyecto de inventario con embeddings
+
+# Entornos virtuales de Python
+.venv/
+venv/
+ENV/
+env/
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Variables de entorno
+.env
+.env.local
+
+# Datos y backups
+data/
+backups/
+*.sql
+*.sql.gz
+
+# Logs
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Docker
+.docker/
+
+# Jupyter Notebooks (si los usas)
+.ipynb_checkpoints/
+*.ipynb
+
+# Base de datos local
+*.db
+*.sqlite
+*.sqlite3
