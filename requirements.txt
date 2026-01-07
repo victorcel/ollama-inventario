@@ -1,0 +1,12 @@
+# requirements.txt
+python-dotenv==1.0.0  # Para manejar variables de entorno
+# Utilidades opcionales pero recomendadas
+
+ollama==0.1.6
+# Cliente de Ollama para embeddings
+
+psycopg2-binary==2.9.9
+# Base de datos PostgreSQL
+
+# Dependencias para el sistema de inventario con embeddings
+
